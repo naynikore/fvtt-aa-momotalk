@@ -1,0 +1,34 @@
+<div class="momotalk-container">
+  {{!-- 모모톡 헤더 --}}
+  <div class="momotalk-bar">
+    <span class="momotalk-bar-title">💬 MomoTalk</span>
+    <button type="button" class="momotalk-bar-btn" data-action="openConfig" title="아바타 설정">
+      <i class="fas fa-user-cog"></i>
+    </button>
+  </div>
+
+  {{!-- 메시지 영역 --}}
+  <div class="momotalk-messages" id="momotalk-msg-area">
+    {{#each messages}}
+    <div class="momotalk-msg {{#if showAvatar}}with-avatar{{else}}continuation{{/if}}" data-speaker="{{speakerKey}}" data-msg-id="{{id}}">
+      {{#if showAvatar}}
+      <div class="momotalk-msg-row">
+        <img class="momotalk-avatar" src="{{avatar}}" alt="{{name}}" />
+        <div class="momotalk-msg-body">
+          <span class="momotalk-name">{{name}}</span>
+          <div class="momotalk-bubble-row">
+            <div class="momotalk-bubble">{{{content}}}</div>
+            <span class="momotalk-time">{{timestamp}}</span>
+          </div>
+        </div>
+      </div>
+      {{else}}
+      <div class="momotalk-bubble-row">
+        <div class="momotalk-bubble">{{{content}}}</div>
+        <span class="momotalk-time">{{timestamp}}</span>
+      </div>
+      {{/if}}
+    </div>
+    {{/each}}
+  </div>
+</div>

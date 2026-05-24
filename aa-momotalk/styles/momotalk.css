@@ -1,0 +1,603 @@
+/* ============================================================
+   MomoTalk — 블루 아카이브 모모톡 스타일 채팅 팝업
+   원작 UI 참고: 연한 하늘색 배경, 말풍선 꼬리, 네이비 이름
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+
+@import url("https://cdn.jsdelivr.net/gh/Nyannnnnng/GyeonggiTitleWoff/stylesheet.css");
+
+:root {
+  --momo-primary: #FA8A9A;
+  --momo-primary-light: #F797AB;
+  --momo-primary-dark: #FA8A9A;
+  --momo-header: linear-gradient(#FA8A9A, #F797AB);
+  --momo-bg: #FFFFFF;
+  --momo-surface: #4c5b70;
+  --momo-text: #FFFFFF;
+  --momo-text-light: #8E9AAB;
+  --momo-bubble: #4c5b70;
+  --momo-bubble-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --momo-name: #45494c;
+  --momo-avatar-size: 40px;
+  --momo-font: 'Noto Sans KR', sans-serif;
+  --momo-font-content: 'GyeonggiTitle', sans-serif;
+}
+
+/* 모모톡 창 내부 전체의 렌더링 스무딩을 보장하기 위한 상속 방지용 리셋 */
+#momotalk-window,
+#momotalk-window *,
+#momotalk-cfg-overlay,
+#momotalk-cfg-overlay * {
+  image-rendering: auto !important;
+}
+
+/* ═══════════════════════════════════════════════
+   Floating Window
+   ═══════════════════════════════════════════════ */
+
+.momotalk-window {
+  position: fixed;
+  right: 320px;
+  bottom: 40px;
+  width: 380px;
+  height: 580px;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--momo-font);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  background: var(--momo-bg);
+}
+
+.momotalk-window.dragging {
+  opacity: 0.92;
+  user-select: none;
+}
+
+/* ═══════════════════════════════════════════════
+   Header Bar — 원작: 하늘색 단색 배경
+   ═══════════════════════════════════════════════ */
+
+.momotalk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--momo-header);
+  color: #fff;
+  user-select: none;
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.momotalk-bar:active {
+  cursor: grabbing;
+}
+
+.momotalk-bar-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.momotalk-bar-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.momotalk-bar-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.momotalk-bar-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ═══════════════════════════════════════════════
+   Messages Area — 원작: 연한 하늘색 배경
+   ═══════════════════════════════════════════════ */
+
+.momotalk-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--momo-bg);
+}
+
+.momotalk-messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 14px;
+  scroll-behavior: smooth;
+}
+
+.momotalk-messages::-webkit-scrollbar {
+  width: 3px;
+}
+
+.momotalk-messages::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+/* ═══════════════════════════════════════════════
+   Message — 원작 모모톡 말풍선 스타일
+   ═══════════════════════════════════════════════ */
+
+.momotalk-msg {
+  margin-bottom: 3px;
+}
+
+.momotalk-msg.with-avatar {
+  margin-top: 16px;
+}
+
+.momotalk-msg.with-avatar:first-child {
+  margin-top: 0;
+}
+
+/* 아바타 + 이름 + 말풍선 */
+.momotalk-msg-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.momotalk-avatar-wrap {
+  width: var(--momo-avatar-size);
+  height: var(--momo-avatar-size);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  background-color: #E2E8F0;
+  /* 흰색 배경의 SVG/투명 폴백 이미지 가시성 확보 */
+
+  /* 크롬 border-radius + 스케일링 가장자리 깨짐 해결을 위한 마스킹 핵 */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(circle, white 100%, black 100%);
+  isolation: isolate;
+}
+
+.momotalk-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: fill !important;
+  /* 이전의 깨지지 않고 다 들어오던 채우기 방식으로 롤백 */
+  display: block;
+  image-rendering: auto !important;
+  image-rendering: smooth !important;
+  image-rendering: high-quality !important;
+
+  /* 픽셀 계단현상을 부드럽게 뭉개기 위한 미세 블러 필터 적용 */
+  filter: blur(0.3px) !important;
+}
+
+.momotalk-msg-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 캐릭터 이름 — 원작: 네이비 블루, 볼드 */
+.momotalk-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--momo-name);
+  margin-bottom: 4px;
+  padding-left: 6px;
+}
+
+/* ─── Bubble Row ─── */
+.momotalk-bubble-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* continuation: 아바타(40) + gap(8) + 말풍선마진(6) = 54px */
+.momotalk-msg.continuation .momotalk-bubble-row {
+  padding-left: calc(var(--momo-avatar-size) + 14px);
+}
+
+/* ─── 말풍선 — 원작: 흰색, 둥근 모서리, 왼쪽 꼬리 ─── */
+.momotalk-bubble {
+  position: relative;
+  background: var(--momo-bubble);
+  border-radius: 12px;
+  padding: 10px 14px;
+  max-width: 78%;
+  box-shadow: var(--momo-bubble-shadow);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--momo-text);
+  word-break: break-word;
+}
+
+/* 첫 메시지 말풍선: 왼쪽 위에 꼬리(삼각형) */
+.momotalk-msg.with-avatar .momotalk-bubble {
+  border-top-left-radius: 4px;
+  margin-left: 6px;
+}
+
+.momotalk-msg.with-avatar .momotalk-bubble::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 6px solid var(--momo-bubble);
+}
+
+/* 연속 메시지: 꼬리 없이 둥근 모서리 */
+.momotalk-msg.continuation .momotalk-bubble {
+  border-radius: 12px;
+}
+
+/* 시간 표시 */
+.momotalk-time {
+  font-size: 10px;
+  color: var(--momo-text-light);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-bottom: 2px;
+}
+
+/* ─── 말풍선 내부 컨텐츠 ─── */
+.momotalk-bubble,
+.momotalk-bubble * {
+  font-family: var(--momo-font-content) !important;
+  font-weight: 500 !important;
+  /* 경기천년제목 Medium 폰트 매칭 */
+  transform: rotate(0.04deg);
+}
+
+.momotalk-bubble p {
+  margin: 0;
+}
+
+.momotalk-bubble img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.momotalk-bubble .inline-roll {
+  background: rgba(74, 159, 245, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.momotalk-bubble .dice-roll {
+  margin: 4px 0;
+}
+
+.momotalk-bubble .dice-total {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--momo-primary);
+}
+
+/* ═══════════════════════════════════════════════
+   모모톡 실행 버튼 (body 고정)
+   ═══════════════════════════════════════════════ */
+
+.momotalk-launch-btn {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 300px;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 0;
+  border: none;
+  border-radius: 0;
+  background: var(--momo-header);
+  color: #fff;
+  font-family: var(--momo-font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  letter-spacing: 0.3px;
+}
+
+.momotalk-launch-btn:hover {
+  background: var(--momo-primary-dark);
+}
+
+.momotalk-launch-btn.active {
+  background: #E05555;
+}
+
+.momotalk-launch-btn.active::after {
+  content: " (닫기)";
+}
+
+/* ═══════════════════════════════════════════════
+   Avatar Config — DOM 기반 오버레이
+   ═══════════════════════════════════════════════ */
+
+.momo-cfg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+}
+
+.momo-cfg-dialog {
+  background: #fff;
+  border-radius: 12px;
+  width: 380px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  font-family: var(--momo-font);
+  overflow: hidden;
+}
+
+.momo-cfg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--momo-primary);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.momo-cfg-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.momo-cfg-close:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.momo-cfg-desc {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  padding: 12px 16px 8px;
+}
+
+.momo-cfg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 16px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.momo-cfg-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: #F5F5F5;
+  border-radius: 8px;
+  border: 1px solid #E0E0E0;
+}
+
+.momo-cfg-img-wrap {
+  width: 36px;
+  height: 36px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 2px solid var(--momo-primary-light);
+  overflow: hidden;
+  background-color: #E2E8F0;
+  /* 흰색 배경의 SVG/투명 폴백 이미지 가시성 확보 */
+
+  /* 크롬 border-radius + 스케일링 가장자리 깨짐 해결을 위한 마스킹 핵 */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(circle, white 100%, black 100%);
+  isolation: isolate;
+}
+
+.momo-cfg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill !important;
+  /* 이전의 깨지지 않고 다 들어오던 채우기 방식으로 롤백 */
+  display: block;
+  image-rendering: auto !important;
+  image-rendering: smooth !important;
+  image-rendering: high-quality !important;
+
+  /* 픽셀 계단현상을 부드럽게 뭉개기 위한 미세 블러 필터 적용 */
+  filter: blur(0.3px) !important;
+}
+
+.momo-cfg-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.momo-cfg-pick,
+.momo-cfg-clear {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid #DDD;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.momo-cfg-pick:hover {
+  background: var(--momo-primary-light);
+  color: #fff;
+  border-color: var(--momo-primary);
+}
+
+.momo-cfg-clear:hover {
+  background: #FF6B6B;
+  color: #fff;
+  border-color: #FF6B6B;
+}
+
+.momo-cfg-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  justify-content: flex-end;
+}
+
+.momo-cfg-save,
+.momo-cfg-cancel {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  font-family: var(--momo-font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.momo-cfg-save {
+  background: var(--momo-primary);
+  color: #fff;
+}
+
+.momo-cfg-save:hover {
+  background: var(--momo-primary-dark);
+}
+
+.momo-cfg-cancel {
+  background: #E0E0E0;
+  color: #333;
+}
+
+.momo-cfg-cancel:hover {
+  background: #CCC;
+}
+
+.momo-cfg-empty {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+}
+
+/* ═══════════════════════════════════════════════
+   Input Area — 모모톡 하단 입력창
+   ═══════════════════════════════════════════════ */
+
+.momotalk-input-container {
+  padding: 10px 14px;
+  background-color: #30424a;
+  /* 예시 이미지의 짙은 남색 배경 */
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.momotalk-input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 20px;
+  /* 둥근 캡슐 형태 */
+  overflow: hidden;
+  height: 36px;
+}
+
+.momotalk-input-field {
+  flex: 1;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 16px !important;
+  height: 100% !important;
+  font-size: 13px !important;
+  color: #333 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.momotalk-input-field::placeholder {
+  color: #aaa;
+}
+
+.momotalk-send-btn {
+  width: 48px;
+  height: 100%;
+  border: none !important;
+  background-color: #ff94b4 !important;
+  /* 모모톡 핑크 전송 버튼 */
+  color: #fff !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+  border-radius: 0 20px 20px 0 !important;
+  /* 오른쪽 반원 둥글기 */
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.momotalk-send-btn:hover {
+  background-color: #ff7d9f !important;
+}
+
+.momotalk-send-btn:active {
+  opacity: 0.85;
+}
+
+/* 크기 조절 핸들 */
+.momotalk-resize-handle {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 14px;
+  height: 14px;
+  cursor: se-resize;
+  z-index: 999;
+  background: linear-gradient(135deg, transparent 40%, rgba(0, 0, 0, 0.15) 40%, rgba(0, 0, 0, 0.15) 50%, transparent 50%, transparent 60%, rgba(0, 0, 0, 0.15) 60%, rgba(0, 0, 0, 0.15) 70%, transparent 70%);
+}

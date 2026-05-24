@@ -1,0 +1,21 @@
+{
+  "id": "aa-momotalk",
+  "title": "MomoTalk",
+  "description": "블루 아카이브 모모톡 스타일 채팅 팝업 모듈",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13.341"
+  },
+  "authors": [
+    {
+      "name": "nora"
+    }
+  ],
+  "esmodules": [
+    "scripts/momotalk.mjs"
+  ],
+  "styles": [
+    "styles/momotalk.css"
+  ]
+}
