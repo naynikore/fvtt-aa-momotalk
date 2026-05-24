@@ -67,10 +67,13 @@ AI를 사용하여 fvtt 13v로 구현한 모모톡 모듈입니다.
 ## 9. License
 본 저작물은 경기도에서 제작한 경기천년체를 사용하였습니다.
 또한 이를 위하여 다음과 같은 프로젝트가 사용되었습니다.
+
 https://github.com/Nyannnnng/GyeonggiTitleWoff
 
 본 저작물은 비공식적인 비영리 목적의 디지털 콘텐츠이며, 주식회사 넥슨코리아의 게임 블루 아카이브의 2차 창작 저작물입니다.
+
 © NEXON Korea Corporation All Rights Reserved.
 
 일본 등의 국가, 지역에서는 주식회사 넥슨코리아와 주식회사 요스타가 공동 소유하여 다음과 같은 저작권 표기를 추가합니다.
+
 © NEXON Games Co., Ltd. & NEXON Korea Corp. & Yostar, Inc. All Rights Reserved.
