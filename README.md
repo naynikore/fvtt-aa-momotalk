@@ -3,6 +3,8 @@
 
 AI를 사용하여 fvtt 13v로 구현한 모모톡 모듈입니다.
 
+manifest: https://github.com/naynikore/fvtt-aa-momotalk/releases/latest/download/module.json
+
 간단하게 사용합니다.
 
 
